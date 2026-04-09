@@ -1,7 +1,8 @@
-﻿import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import React from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
+import { useAppTheme } from '@/lib/theme';
 
 type WebSidebarTabBarProps = BottomTabBarProps & {
   collapsed: boolean;
@@ -21,6 +22,7 @@ export default function WebSidebarTabBar({
   collapsed,
   onToggleCollapse,
 }: WebSidebarTabBarProps) {
+  const { palette } = useAppTheme();
   const sidebarWidth = collapsed ? 88 : 248;
 
   return (
@@ -31,9 +33,9 @@ export default function WebSidebarTabBar({
         left: 0,
         bottom: 0,
         width: sidebarWidth,
-        backgroundColor: 'rgba(17,19,21,0.82)',
+        backgroundColor: palette.surfaceAlt,
         borderRightWidth: 1,
-        borderRightColor: 'rgba(214,235,253,0.18)',
+        borderRightColor: palette.border,
         paddingTop: 16,
         paddingBottom: 12,
         paddingHorizontal: 12,
@@ -51,7 +53,7 @@ export default function WebSidebarTabBar({
       >
         <Text
           style={{
-            color: '#f0f0f0',
+            color: palette.textPrimary,
             fontSize: collapsed ? 16 : 34,
             letterSpacing: collapsed ? 0.6 : -0.4,
             fontWeight: '500',
@@ -68,16 +70,16 @@ export default function WebSidebarTabBar({
             onPress={onToggleCollapse}
             style={{
               borderWidth: 1,
-              borderColor: 'rgba(214,235,253,0.24)',
+              borderColor: palette.borderStrong,
               borderRadius: 999,
               width: 30,
               height: 30,
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: 'rgba(78,164,255,0.1)',
+              backgroundColor: palette.primarySoft,
             }}
           >
-            <FontAwesome name="chevron-left" size={12} color="#70b1ff" />
+            <FontAwesome name="chevron-left" size={12} color={palette.primary} />
           </Pressable>
         ) : null}
       </View>
@@ -89,16 +91,16 @@ export default function WebSidebarTabBar({
             marginBottom: 12,
             alignSelf: 'center',
             borderWidth: 1,
-            borderColor: 'rgba(214,235,253,0.24)',
+            borderColor: palette.borderStrong,
             borderRadius: 999,
             width: 30,
             height: 30,
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: 'rgba(78,164,255,0.1)',
+            backgroundColor: palette.primarySoft,
           }}
         >
-          <FontAwesome name="chevron-right" size={12} color="#70b1ff" />
+          <FontAwesome name="chevron-right" size={12} color={palette.primary} />
         </Pressable>
       ) : null}
 
@@ -106,7 +108,7 @@ export default function WebSidebarTabBar({
         <View style={{ gap: 6 }}>
           {state.routes.map((route, index) => {
             const focused = state.index === index;
-            const color = focused ? '#70b1ff' : '#9aa2a8';
+            const color = focused ? palette.primary : palette.textSecondary;
             const options = descriptors[route.key]?.options;
             const label = getLabel(options?.tabBarLabel, options?.title, route.name);
 
@@ -132,9 +134,9 @@ export default function WebSidebarTabBar({
                   alignItems: 'center',
                   justifyContent: collapsed ? 'center' : 'flex-start',
                   paddingHorizontal: collapsed ? 0 : 12,
-                  backgroundColor: focused ? 'rgba(78,164,255,0.18)' : 'transparent',
+                  backgroundColor: focused ? palette.primarySoft : 'transparent',
                   borderWidth: focused ? 1 : 0,
-                  borderColor: focused ? 'rgba(112,177,255,0.35)' : 'transparent',
+                  borderColor: focused ? palette.borderStrong : 'transparent',
                 }}
               >
                 <View style={{ marginRight: collapsed ? 0 : 10 }}>
@@ -161,5 +163,3 @@ export default function WebSidebarTabBar({
     </View>
   );
 }
-
-

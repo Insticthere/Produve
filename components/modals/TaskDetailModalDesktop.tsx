@@ -3,6 +3,7 @@ import { Modal, Pressable, SafeAreaView, ScrollView, Text, TextInput, View } fro
 import { Ionicons } from '@expo/vector-icons';
 import clsx from 'clsx';
 import { showToast } from '@/lib/toast';
+import { useAppTheme } from '@/lib/theme';
 
 type ChecklistItem = {
   id: string;
@@ -67,6 +68,7 @@ export default function TaskDetailModalDesktop({
   height,
   data,
 }: TaskDetailModalProps) {
+  const { palette } = useAppTheme();
   const task = { ...DEFAULT_DATA, ...data };
   const [subtaskDraft, setSubtaskDraft] = useState('');
   const [localChecklist, setLocalChecklist] = useState<ChecklistItem[]>(task.checklist);
@@ -97,7 +99,7 @@ export default function TaskDetailModalDesktop({
 
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
-      <View className="flex-1 items-center justify-center bg-[rgba(0,0,0,0.72)] p-2">
+      <View className="flex-1 items-center justify-center p-2" style={{ backgroundColor: palette.overlay }}>
         <Pressable className="absolute inset-0" onPress={onClose} />
 
         <View
@@ -106,8 +108,8 @@ export default function TaskDetailModalDesktop({
             width: Math.min(width - 48, 1120),
             maxHeight: height - 80,
             borderWidth: 1,
-            borderColor: 'rgba(214,235,253,0.26)',
-            backgroundColor: 'rgba(19,19,19,0.86)',
+            borderColor: palette.borderStrong,
+            backgroundColor: palette.modalBackground,
             shadowColor: '#000',
             shadowOpacity: 0.35,
             shadowRadius: 20,
@@ -123,67 +125,67 @@ export default function TaskDetailModalDesktop({
               width: 180,
               height: 180,
               borderRadius: 999,
-              backgroundColor: 'rgba(112,177,255,0.08)',
+              backgroundColor: palette.primarySoft,
             }}
           />
-          <SafeAreaView className="flex-1 bg-[rgba(19,19,19,0.78)]">
+          <SafeAreaView className="flex-1" style={{ backgroundColor: palette.surface }}>
             <View
               className="h-14 flex-row items-center justify-between px-6"
               style={{
                 borderBottomWidth: 1,
-                borderBottomColor: 'rgba(214,235,253,0.16)',
-                backgroundColor: 'rgba(25,25,25,0.84)',
+                borderBottomColor: palette.border,
+                backgroundColor: palette.surfaceAlt,
               }}
             >
-              <Text className="font-section text-[20px] tracking-[0.2px] text-void-text-primary">Task Details</Text>
+              <Text className="font-section text-[20px] tracking-[0.2px]" style={{ color: palette.textPrimary }}>Task Details</Text>
               <Pressable onPress={onClose} className="items-center justify-center px-1 py-1">
-                <Ionicons name="close" size={18} color="#f0f0f0" />
+                <Ionicons name="close" size={18} color={palette.textPrimary} />
               </Pressable>
             </View>
 
             <View className="flex-1 flex-row">
               <ScrollView
-                className="flex-1 bg-[rgba(19,19,19,0.78)]"
-                style={{ borderRightWidth: 1, borderRightColor: 'rgba(214,235,253,0.14)' }}
+                className="flex-1"
+                style={{ borderRightWidth: 1, borderRightColor: palette.border, backgroundColor: palette.surface }}
                 showsVerticalScrollIndicator={false}
               >
                 <View className="p-[22px]">
                   <View className="mb-3.5 flex-row items-center gap-3">
-                    <Text className="rounded-full border border-[#ff716c66] bg-[#ff716c14] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.6px] text-[#ff716c]">
+                    <Text className="rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.6px]" style={{ borderWidth: 1, borderColor: `${palette.danger}66`, backgroundColor: `${palette.danger}1f`, color: palette.danger }}>
                       {task.priorityLabel}
                     </Text>
-                    <Text className="font-mono text-[11px] tracking-[0.8px] text-void-text-secondary">{task.id}</Text>
+                    <Text className="font-mono text-[11px] tracking-[0.8px]" style={{ color: palette.textSecondary }}>{task.id}</Text>
                   </View>
 
-                  <Text className="mb-4 font-display text-[36px] leading-[40px] text-void-text-primary">{task.title}</Text>
+                  <Text className="mb-4 font-display text-[36px] leading-[40px]" style={{ color: palette.textPrimary }}>{task.title}</Text>
 
-                  <Text className="mb-2 font-mono text-[10px] uppercase tracking-[1.2px] text-void-text-secondary">
+                  <Text className="mb-2 font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.textSecondary }}>
                     Description
                   </Text>
-                  <Text className="mb-5 font-body text-[14px] leading-[22px] text-[#d2d4d5]">{task.description}</Text>
+                  <Text className="mb-5 font-body text-[14px] leading-[22px]" style={{ color: palette.textSecondary }}>{task.description}</Text>
 
                   <View className="mb-6 flex-row gap-5">
                     <View className="flex-1">
-                      <Text className="mb-1.5 font-mono text-[10px] uppercase tracking-[1.2px] text-void-text-secondary">
+                      <Text className="mb-1.5 font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.textSecondary }}>
                         Subject
                       </Text>
-                      <Text className="font-body text-[14px] text-void-text-primary">{task.subject}</Text>
+                      <Text className="font-body text-[14px]" style={{ color: palette.textPrimary }}>{task.subject}</Text>
                     </View>
                     <View className="flex-1">
-                      <Text className="mb-1.5 font-mono text-[10px] uppercase tracking-[1.2px] text-void-text-secondary">
+                      <Text className="mb-1.5 font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.textSecondary }}>
                         Chapter
                       </Text>
-                      <Text className="font-body text-[14px] text-void-text-primary">{task.chapter}</Text>
+                      <Text className="font-body text-[14px]" style={{ color: palette.textPrimary }}>{task.chapter}</Text>
                     </View>
                   </View>
 
                   <View className="flex-row items-center gap-3 pt-1">
-                    <Pressable onPress={() => showToast('Task marked complete')} className="rounded-full bg-[#4ea4ff] px-4 py-[11px]">
-                      <Text className="font-body text-[13px] text-[#001b32]">Mark Complete</Text>
+                    <Pressable onPress={() => showToast('Task marked complete')} className="rounded-full px-4 py-[11px]" style={{ backgroundColor: palette.primary }}>
+                      <Text className="font-body text-[13px]" style={{ color: palette.dark ? '#001b32' : '#ffffff' }}>Mark Complete</Text>
                     </Pressable>
-                    <Pressable className="flex-row items-center gap-1.5 rounded-full border border-[#ff716c33] px-3 py-2">
-                      <Ionicons name="trash-outline" size={14} color="#ff716c" />
-                      <Text className="font-body text-[12px] text-[#ff716c]">Delete</Text>
+                    <Pressable className="flex-row items-center gap-1.5 rounded-full px-3 py-2" style={{ borderWidth: 1, borderColor: `${palette.danger}55` }}>
+                      <Ionicons name="trash-outline" size={14} color={palette.danger} />
+                      <Text className="font-body text-[12px]" style={{ color: palette.danger }}>Delete</Text>
                     </Pressable>
                   </View>
                 </View>

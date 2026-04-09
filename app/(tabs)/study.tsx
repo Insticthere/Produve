@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Modal,
@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import clsx from 'clsx';
 import PageScroll from '@/components/ui/PageScroll';
+import { useAppTheme } from '@/lib/theme';
 
 type Question = {
   id: string;
@@ -143,6 +144,7 @@ const PERSONAL_RESOURCES = [
 ];
 
 export default function StudyScreen() {
+  const { palette } = useAppTheme();
   const [subjects, setSubjects] = useState(INITIAL_SUBJECTS);
   const [selectedSubjectId, setSelectedSubjectId] = useState(INITIAL_SUBJECTS[0]?.id ?? '');
   const [selectedBookId, setSelectedBookId] = useState(INITIAL_SUBJECTS[0]?.books[0]?.id ?? '');
@@ -295,20 +297,20 @@ export default function StudyScreen() {
   };
 
   return (
-    <SafeAreaView className="min-h-0 flex-1 bg-[#0e0e0e]">
+    <SafeAreaView className="min-h-0 flex-1" style={{ backgroundColor: palette.background }}>
       <Animated.View style={{ opacity: fade }} className="min-h-0 flex-1">
         <PageScroll>
           <View className="mb-8">
-            <Text className="font-mono text-[10px] uppercase tracking-[1.2px] text-[#70b1ff]">Produve</Text>
-            <Text className="mt-1 font-display text-[46px] leading-[48px] text-void-text-primary">Study</Text>
-            <Text className="mt-2 font-body text-[14px] text-void-text-secondary">
+            <Text className="font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.primary }}>Produve</Text>
+            <Text className="mt-1 font-display text-[46px] leading-[48px]" style={{ color: palette.textPrimary }}>Study</Text>
+            <Text className="mt-2 font-body text-[14px]" style={{ color: palette.textSecondary }}>
               Subject-based workflow: Subjects to Books to Questions.
             </Text>
           </View>
 
           <View
-            className="mb-6 flex-row rounded-full bg-[rgba(19,19,19,0.78)] p-1"
-            style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.2)' }}
+            className="mb-6 flex-row rounded-full p-1"
+            style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface }}
           >
             {([
               { id: 'subjects', label: 'Subjects' },
@@ -318,9 +320,10 @@ export default function StudyScreen() {
               <Pressable
                 key={item.id}
                 onPress={() => setTab(item.id)}
-                className={clsx('flex-1 rounded-full py-2 items-center', tab === item.id ? 'bg-white/10' : '')}
+                className={clsx('flex-1 rounded-full py-2 items-center')}
+                style={{ backgroundColor: tab === item.id ? palette.primarySoft : 'transparent' }}
               >
-                <Text className={clsx('font-mono text-[10px] uppercase', tab === item.id ? 'text-white' : 'text-void-text-secondary')}>
+                <Text className={clsx('font-mono text-[10px] uppercase')} style={{ color: tab === item.id ? palette.primary : palette.textSecondary }}>
                   {item.label}
                 </Text>
               </Pressable>
@@ -330,24 +333,24 @@ export default function StudyScreen() {
           {tab === 'subjects' ? (
             <>
               <View className="mb-6 gap-3">
-                <View className="rounded-[16px] bg-[rgba(19,19,19,0.78)] p-4" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.19)' }}>
-                  <Text className="font-mono text-[10px] uppercase text-void-text-tertiary">Questions Solved</Text>
-                  <Text className="mt-1 font-section text-[22px] text-white">{stats.solved}</Text>
+                <View className="rounded-[16px] p-4" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface }}>
+                  <Text className="font-mono text-[10px] uppercase" style={{ color: palette.textTertiary }}>Questions Solved</Text>
+                  <Text className="mt-1 font-section text-[22px]" style={{ color: palette.textPrimary }}>{stats.solved}</Text>
                 </View>
-                <View className="rounded-[16px] bg-[rgba(19,19,19,0.78)] p-4" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.19)' }}>
-                  <Text className="font-mono text-[10px] uppercase text-void-text-tertiary">Books Active</Text>
-                  <Text className="mt-1 font-section text-[22px] text-[#70b1ff]">{stats.books}</Text>
+                <View className="rounded-[16px] p-4" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface }}>
+                  <Text className="font-mono text-[10px] uppercase" style={{ color: palette.textTertiary }}>Books Active</Text>
+                  <Text className="mt-1 font-section text-[22px]" style={{ color: palette.primary }}>{stats.books}</Text>
                 </View>
-                <View className="rounded-[16px] bg-[rgba(19,19,19,0.78)] p-4" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.19)' }}>
-                  <Text className="font-mono text-[10px] uppercase text-void-text-tertiary">Redo Queue</Text>
-                  <Text className="mt-1 font-section text-[22px] text-[#ff716c]">{stats.redo}</Text>
+                <View className="rounded-[16px] p-4" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface }}>
+                  <Text className="font-mono text-[10px] uppercase" style={{ color: palette.textTertiary }}>Redo Queue</Text>
+                  <Text className="mt-1 font-section text-[22px]" style={{ color: palette.danger }}>{stats.redo}</Text>
                 </View>
               </View>
 
               <View className="mb-4 flex-row items-center justify-between">
-                <Text className="font-mono text-[10px] uppercase tracking-[1.2px] text-void-text-secondary">Subjects</Text>
-                <Pressable onPress={() => setShowSubjectModal(true)} className="rounded-full bg-[#4ea4ff] px-3 py-1.5">
-                  <Text className="font-body text-[11px] text-[#001b32]">Add Subject</Text>
+                <Text className="font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.textSecondary }}>Subjects</Text>
+                <Pressable onPress={() => setShowSubjectModal(true)} className="rounded-full px-3 py-1.5" style={{ backgroundColor: palette.primary }}>
+                  <Text className="font-body text-[11px]" style={{ color: palette.dark ? '#001b32' : '#ffffff' }}>Add Subject</Text>
                 </Pressable>
               </View>
 
@@ -362,14 +365,14 @@ export default function StudyScreen() {
                       }}
                       className={clsx(
                         'rounded-full border px-3 py-1.5',
-                        selectedSubjectId === s.id ? 'bg-[#4ea4ff2a]' : 'bg-[rgba(19,19,19,0.78)]'
+                        selectedSubjectId === s.id ? '' : ''
                       )}
                       style={{
-                        borderColor:
-                          selectedSubjectId === s.id ? 'rgba(78,164,255,0.65)' : 'rgba(214,235,253,0.2)',
+                        borderColor: selectedSubjectId === s.id ? `${palette.primary}99` : palette.border,
+                        backgroundColor: selectedSubjectId === s.id ? palette.primarySoft : palette.surface,
                       }}
                     >
-                      <Text className={clsx('font-mono text-[10px] uppercase', selectedSubjectId === s.id ? 'text-[#70b1ff]' : 'text-void-text-secondary')}>
+                      <Text className={clsx('font-mono text-[10px] uppercase')} style={{ color: selectedSubjectId === s.id ? palette.primary : palette.textSecondary }}>
                         {s.name}
                       </Text>
                     </Pressable>
@@ -377,11 +380,11 @@ export default function StudyScreen() {
                 </View>
               </ScrollView>
 
-              <View className="mb-8 rounded-[18px] bg-[rgba(19,19,19,0.78)] p-5" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.22)' }}>
+              <View className="mb-8 rounded-[18px] p-5" style={{ borderWidth: 1, borderColor: palette.borderStrong, backgroundColor: palette.surface }}>
                 <View className="flex-row items-center justify-between">
-                  <Text className="font-mono text-[10px] uppercase tracking-[1.2px] text-void-text-secondary">Books</Text>
-                  <Pressable onPress={() => setShowBookModal(true)} className="rounded-full border border-white/20 px-3 py-1.5">
-                    <Text className="font-mono text-[10px] text-white">Add Book</Text>
+                  <Text className="font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.textSecondary }}>Books</Text>
+                  <Pressable onPress={() => setShowBookModal(true)} className="rounded-full border px-3 py-1.5" style={{ borderColor: palette.borderStrong }}>
+                    <Text className="font-mono text-[10px]" style={{ color: palette.textPrimary }}>Add Book</Text>
                   </Pressable>
                 </View>
 
@@ -392,65 +395,65 @@ export default function StudyScreen() {
                         key={book.id}
                         onPress={() => setSelectedBookId(book.id)}
                         className={clsx(
-                          'rounded-[14px] bg-[rgba(23,26,29,0.72)] p-3',
+                          'rounded-[14px] p-3',
                           selectedBookId === book.id ? 'border-[#4ea4ff66]' : ''
                         )}
-                        style={{ borderWidth: 1, borderColor: selectedBookId === book.id ? 'rgba(78,164,255,0.5)' : 'rgba(214,235,253,0.13)' }}
+                        style={{ borderWidth: 1, borderColor: selectedBookId === book.id ? `${palette.primary}88` : palette.border, backgroundColor: palette.surfaceAlt }}
                       >
                         <View className="flex-row items-center justify-between">
-                          <Text className="font-body text-[14px] text-white">{book.title}</Text>
-                          <Text className="font-mono text-[10px] text-[#70b1ff]">{book.progress}%</Text>
+                          <Text className="font-body text-[14px]" style={{ color: palette.textPrimary }}>{book.title}</Text>
+                          <Text className="font-mono text-[10px]" style={{ color: palette.primary }}>{book.progress}%</Text>
                         </View>
-                        <Text className="mt-1 font-body text-[12px] text-void-text-secondary">{book.author}</Text>
-                        <Text className="mt-1 font-mono text-[10px] text-void-text-tertiary">{book.currentPart}</Text>
-                        <View className="mt-2 h-2 overflow-hidden rounded-full bg-black/40">
-                          <View className="h-full bg-[#4ea4ff]" style={{ width: `${book.progress}%` }} />
+                        <Text className="mt-1 font-body text-[12px]" style={{ color: palette.textSecondary }}>{book.author}</Text>
+                        <Text className="mt-1 font-mono text-[10px]" style={{ color: palette.textTertiary }}>{book.currentPart}</Text>
+                        <View className="mt-2 h-2 overflow-hidden rounded-full" style={{ backgroundColor: palette.surface }}>
+                          <View className="h-full" style={{ width: `${book.progress}%`, backgroundColor: palette.primary }} />
                         </View>
                         <View className="mt-3 flex-row gap-2">
-                          <Pressable onPress={() => updateBookProgress(book.id, -5)} className="rounded-full border border-white/20 px-3 py-1.5">
-                            <Text className="font-mono text-[10px] text-void-text-secondary">-5%</Text>
+                          <Pressable onPress={() => updateBookProgress(book.id, -5)} className="rounded-full border px-3 py-1.5" style={{ borderColor: palette.borderStrong }}>
+                            <Text className="font-mono text-[10px]" style={{ color: palette.textSecondary }}>-5%</Text>
                           </Pressable>
-                          <Pressable onPress={() => updateBookProgress(book.id, 5)} className="rounded-full border border-white/20 px-3 py-1.5">
-                            <Text className="font-mono text-[10px] text-void-text-secondary">+5%</Text>
+                          <Pressable onPress={() => updateBookProgress(book.id, 5)} className="rounded-full border px-3 py-1.5" style={{ borderColor: palette.borderStrong }}>
+                            <Text className="font-mono text-[10px]" style={{ color: palette.textSecondary }}>+5%</Text>
                           </Pressable>
                         </View>
                       </Pressable>
                     ))
                   ) : (
-                    <Text className="font-body text-[13px] text-void-text-tertiary">No books in this subject yet.</Text>
+                    <Text className="font-body text-[13px]" style={{ color: palette.textTertiary }}>No books in this subject yet.</Text>
                   )}
                 </View>
               </View>
 
-              <View className="rounded-[18px] bg-[rgba(19,19,19,0.78)] p-5" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.22)' }}>
+              <View className="rounded-[18px] p-5" style={{ borderWidth: 1, borderColor: palette.borderStrong, backgroundColor: palette.surface }}>
                 <View className="flex-row items-center justify-between">
-                  <Text className="font-mono text-[10px] uppercase tracking-[1.2px] text-void-text-secondary">Questions</Text>
-                  <Pressable onPress={() => setShowQuestionModal(true)} className="rounded-full border border-white/20 px-3 py-1.5">
-                    <Text className="font-mono text-[10px] text-white">Add Question</Text>
+                  <Text className="font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.textSecondary }}>Questions</Text>
+                  <Pressable onPress={() => setShowQuestionModal(true)} className="rounded-full border px-3 py-1.5" style={{ borderColor: palette.borderStrong }}>
+                    <Text className="font-mono text-[10px]" style={{ color: palette.textPrimary }}>Add Question</Text>
                   </Pressable>
                 </View>
 
                 <View className="mt-4 gap-3">
                   {selectedBook?.questions.length ? (
                     selectedBook.questions.map((q) => (
-                      <View key={q.id} className="rounded-[14px] bg-[rgba(23,26,29,0.72)] p-3" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.12)' }}>
-                        <Text className="font-body text-[14px] text-white">{q.title}</Text>
-                        <Text className="mt-1 font-mono text-[10px] text-void-text-tertiary">{q.section}</Text>
+                      <View key={q.id} className="rounded-[14px] p-3" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surfaceAlt }}>
+                        <Text className="font-body text-[14px]" style={{ color: palette.textPrimary }}>{q.title}</Text>
+                        <Text className="mt-1 font-mono text-[10px]" style={{ color: palette.textTertiary }}>{q.section}</Text>
                         <View className="mt-3 flex-row gap-2">
                           <Pressable onPress={() => updateQuestion(q.id, 'solved')} className={clsx('rounded-full px-3 py-1.5', q.solved ? 'bg-[#4ea4ff2a]' : 'bg-transparent')} style={{ borderWidth: 1, borderColor: q.solved ? 'rgba(78,164,255,0.6)' : 'rgba(214,235,253,0.2)' }}>
-                            <Text className={clsx('font-mono text-[10px]', q.solved ? 'text-[#70b1ff]' : 'text-void-text-secondary')}>Solved</Text>
+                            <Text className="font-mono text-[10px]" style={{ color: q.solved ? palette.primary : palette.textSecondary }}>Solved</Text>
                           </Pressable>
                           <Pressable onPress={() => updateQuestion(q.id, 'good')} className={clsx('rounded-full px-3 py-1.5', q.good ? 'bg-[#01fc972a]' : 'bg-transparent')} style={{ borderWidth: 1, borderColor: q.good ? 'rgba(1,252,151,0.6)' : 'rgba(214,235,253,0.2)' }}>
-                            <Text className={clsx('font-mono text-[10px]', q.good ? 'text-[#01fc97]' : 'text-void-text-secondary')}>Good</Text>
+                            <Text className="font-mono text-[10px]" style={{ color: q.good ? palette.success : palette.textSecondary }}>Good</Text>
                           </Pressable>
                           <Pressable onPress={() => updateQuestion(q.id, 'redo')} className={clsx('rounded-full px-3 py-1.5', q.redo ? 'bg-[#ff716c2a]' : 'bg-transparent')} style={{ borderWidth: 1, borderColor: q.redo ? 'rgba(255,113,108,0.6)' : 'rgba(214,235,253,0.2)' }}>
-                            <Text className={clsx('font-mono text-[10px]', q.redo ? 'text-[#ff716c]' : 'text-void-text-secondary')}>Redo</Text>
+                            <Text className="font-mono text-[10px]" style={{ color: q.redo ? palette.danger : palette.textSecondary }}>Redo</Text>
                           </Pressable>
                         </View>
                       </View>
                     ))
                   ) : (
-                    <Text className="font-body text-[13px] text-void-text-tertiary">Pick a book to manage questions.</Text>
+                    <Text className="font-body text-[13px]" style={{ color: palette.textTertiary }}>Pick a book to manage questions.</Text>
                   )}
                 </View>
               </View>
@@ -458,22 +461,22 @@ export default function StudyScreen() {
           ) : null}
 
           {tab === 'resources' ? (
-            <View className="rounded-[18px] bg-[rgba(19,19,19,0.78)] p-5" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.22)' }}>
-              <View className="mb-4 flex-row rounded-full bg-[#0f1113] p-1" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.16)' }}>
-                <Pressable onPress={() => setResourceTab('mine')} className={clsx('flex-1 rounded-full py-2 items-center', resourceTab === 'mine' ? 'bg-white/10' : '')}>
-                  <Text className={clsx('font-mono text-[10px] uppercase', resourceTab === 'mine' ? 'text-white' : 'text-void-text-secondary')}>My Resources</Text>
+            <View className="rounded-[18px] p-5" style={{ borderWidth: 1, borderColor: palette.borderStrong, backgroundColor: palette.surface }}>
+              <View className="mb-4 flex-row rounded-full p-1" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surfaceAlt }}>
+                <Pressable onPress={() => setResourceTab('mine')} className={clsx('flex-1 rounded-full py-2 items-center', resourceTab === 'mine' ? 'bg-[#4ea4ff20]' : '')}>
+                  <Text className="font-mono text-[10px] uppercase" style={{ color: resourceTab === 'mine' ? palette.primary : palette.textSecondary }}>My Resources</Text>
                 </Pressable>
-                <Pressable onPress={() => setResourceTab('community')} className={clsx('flex-1 rounded-full py-2 items-center', resourceTab === 'community' ? 'bg-white/10' : '')}>
-                  <Text className={clsx('font-mono text-[10px] uppercase', resourceTab === 'community' ? 'text-white' : 'text-void-text-secondary')}>Community</Text>
+                <Pressable onPress={() => setResourceTab('community')} className={clsx('flex-1 rounded-full py-2 items-center', resourceTab === 'community' ? 'bg-[#4ea4ff20]' : '')}>
+                  <Text className="font-mono text-[10px] uppercase" style={{ color: resourceTab === 'community' ? palette.primary : palette.textSecondary }}>Community</Text>
                 </Pressable>
               </View>
 
               {resourceTab === 'mine' ? (
                 <View className="gap-3">
                   {PERSONAL_RESOURCES.map((r) => (
-                    <View key={r.id} className="rounded-[14px] bg-[rgba(23,26,29,0.72)] p-3" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.12)' }}>
-                      <Text className="font-body text-[13px] text-white">{r.title}</Text>
-                      <Text className="mt-1 font-body text-[12px] text-void-text-secondary">{r.note}</Text>
+                    <View key={r.id} className="rounded-[14px] p-3" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surfaceAlt }}>
+                      <Text className="font-body text-[13px]" style={{ color: palette.textPrimary }}>{r.title}</Text>
+                      <Text className="mt-1 font-body text-[12px]" style={{ color: palette.textSecondary }}>{r.note}</Text>
                     </View>
                   ))}
                 </View>
@@ -490,14 +493,14 @@ export default function StudyScreen() {
                       style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.12)' }}
                     >
                       <View className="flex-row items-center justify-between">
-                        <Text className="font-body text-[14px] text-white">{plan.title}</Text>
-                        <Text className="font-mono text-[10px] text-[#70b1ff]">{plan.type}</Text>
+                        <Text className="font-body text-[14px]" style={{ color: palette.textPrimary }}>{plan.title}</Text>
+                        <Text className="font-mono text-[10px]" style={{ color: palette.primary }}>{plan.type}</Text>
                       </View>
-                      <Text className="mt-1 font-mono text-[10px] text-void-text-tertiary">
+                      <Text className="mt-1 font-mono text-[10px]" style={{ color: palette.textTertiary }}>
                         {plan.subject} | by {plan.author}
                       </Text>
-                      <Text className="mt-1 font-body text-[12px] text-void-text-secondary">{plan.summary}</Text>
-                      <Text className="mt-2 font-mono text-[10px] text-void-text-tertiary">
+                      <Text className="mt-1 font-body text-[12px]" style={{ color: palette.textSecondary }}>{plan.summary}</Text>
+                      <Text className="mt-2 font-mono text-[10px]" style={{ color: palette.textTertiary }}>
                         * {plan.rating.toFixed(1)} | Saves {plan.saves}
                       </Text>
                     </Pressable>
@@ -508,24 +511,24 @@ export default function StudyScreen() {
           ) : null}
 
           {tab === 'saved' ? (
-            <View className="rounded-[18px] bg-[rgba(19,19,19,0.78)] p-5" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.22)' }}>
-              <Text className="font-mono text-[10px] uppercase tracking-[1.2px] text-void-text-secondary">Saved Plans</Text>
+            <View className="rounded-[18px] p-5" style={{ borderWidth: 1, borderColor: palette.borderStrong, backgroundColor: palette.surface }}>
+              <Text className="font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.textSecondary }}>Saved Plans</Text>
               <View className="mt-4 gap-3">
                 {savedPlans.length ? (
                   savedPlans.map((plan) => (
-                    <View key={plan.id} className="rounded-[14px] bg-[rgba(23,26,29,0.72)] p-3" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.12)' }}>
+                    <View key={plan.id} className="rounded-[14px] p-3" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surfaceAlt }}>
                       <View className="flex-row items-center justify-between">
-                        <Text className="font-body text-[14px] text-white">{plan.title}</Text>
-                        <Text className="font-mono text-[10px] text-[#70b1ff]">{plan.type}</Text>
+                        <Text className="font-body text-[14px]" style={{ color: palette.textPrimary }}>{plan.title}</Text>
+                        <Text className="font-mono text-[10px]" style={{ color: palette.primary }}>{plan.type}</Text>
                       </View>
-                      <Text className="mt-1 font-mono text-[10px] text-void-text-tertiary">
-                        {plan.subject} â€¢ {plan.author}
+                      <Text className="mt-1 font-mono text-[10px]" style={{ color: palette.textTertiary }}>
+                        {plan.subject} • {plan.author}
                       </Text>
-                      <Text className="mt-1 font-body text-[12px] text-void-text-secondary">{plan.summary}</Text>
+                      <Text className="mt-1 font-body text-[12px]" style={{ color: palette.textSecondary }}>{plan.summary}</Text>
                     </View>
                   ))
                 ) : (
-                  <Text className="font-body text-[13px] text-void-text-tertiary">
+                  <Text className="font-body text-[13px]" style={{ color: palette.textTertiary }}>
                     No saved plans yet. Save plans from Resources to Community.
                   </Text>
                 )}
@@ -590,11 +593,11 @@ export default function StudyScreen() {
             <View className="w-full max-w-[520px] rounded-[20px] bg-[rgba(19,19,19,0.78)] p-5" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.22)' }}>
               <Text className="font-mono text-[10px] uppercase text-[#70b1ff]">{selectedPlan.type}</Text>
               <Text className="mt-1 font-section text-[24px] text-white">{selectedPlan.title}</Text>
-              <Text className="mt-1 font-mono text-[10px] text-void-text-tertiary">
+              <Text className="mt-1 font-mono text-[10px]" style={{ color: palette.textTertiary }}>
                 {selectedPlan.subject} | by {selectedPlan.author}
               </Text>
-              <Text className="mt-3 font-body text-[13px] text-void-text-secondary">{selectedPlan.summary}</Text>
-              <Text className="mt-2 font-mono text-[10px] text-void-text-tertiary">
+              <Text className="mt-3 font-body text-[13px]" style={{ color: palette.textSecondary }}>{selectedPlan.summary}</Text>
+              <Text className="mt-2 font-mono text-[10px]" style={{ color: palette.textTertiary }}>
                 * {selectedPlan.rating.toFixed(1)} | Saves {selectedPlan.saves}
               </Text>
               <Pressable onPress={() => savePlan(selectedPlan)} className="mt-4 self-start rounded-full bg-[#4ea4ff] px-4 py-2.5">
@@ -607,6 +610,8 @@ export default function StudyScreen() {
     </SafeAreaView>
   );
 }
+
+
 
 
 

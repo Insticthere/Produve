@@ -4,6 +4,7 @@ import { Tabs } from 'expo-router';
 import { Platform, useWindowDimensions } from 'react-native';
 import WebSidebarTabBar from '@/components/navigation/WebSidebarTabBar';
 import WebTopMenuTabBar from '@/components/navigation/WebTopMenuTabBar';
+import { useAppTheme } from '@/lib/theme';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -14,6 +15,7 @@ function TabBarIcon(props: {
 }
 
 export default function TabLayout() {
+  const { palette } = useAppTheme();
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
   const isDesktopWeb = isWeb && width >= 1024;
@@ -39,17 +41,17 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         sceneStyle: {
-          backgroundColor: '#0e0e0e',
+          backgroundColor: palette.background,
           flex: 1,
           minHeight: 0,
           paddingLeft: isDesktopWeb ? desktopSidebarWidth : 0,
         },
         tabBarPosition: isDesktopWeb ? 'left' : isSmallWeb ? 'top' : 'bottom',
-        tabBarActiveTintColor: '#70b1ff',
-        tabBarInactiveTintColor: '#8b9398',
+        tabBarActiveTintColor: palette.primary,
+        tabBarInactiveTintColor: palette.textSecondary,
         tabBarStyle: {
-          backgroundColor: 'rgba(19,19,19,0.78)',
-          borderTopColor: 'rgba(214,235,253,0.19)',
+          backgroundColor: palette.surface,
+          borderTopColor: palette.border,
           borderTopWidth: isWeb ? 0 : 1,
         },
       }}

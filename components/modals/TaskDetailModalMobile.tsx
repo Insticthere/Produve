@@ -3,6 +3,7 @@ import { Modal, Pressable, SafeAreaView, ScrollView, Text, TextInput, View } fro
 import { Ionicons } from '@expo/vector-icons';
 import clsx from 'clsx';
 import { showToast } from '@/lib/toast';
+import { useAppTheme } from '@/lib/theme';
 
 type ChecklistItem = {
   id: string;
@@ -60,6 +61,7 @@ const DEFAULT_DATA: TaskDetailModalData = {
 };
 
 export default function TaskDetailModalMobile({ visible, onClose, height, data }: TaskDetailModalProps) {
+  const { palette } = useAppTheme();
   const task = { ...DEFAULT_DATA, ...data };
   const [subtaskDraft, setSubtaskDraft] = useState('');
   const [localChecklist, setLocalChecklist] = useState<ChecklistItem[]>(task.checklist);
@@ -90,7 +92,7 @@ export default function TaskDetailModalMobile({ visible, onClose, height, data }
 
   return (
     <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
-      <View className="flex-1 items-center justify-end bg-[rgba(0,0,0,0.72)] p-0">
+      <View className="flex-1 items-center justify-end p-0" style={{ backgroundColor: palette.overlay }}>
         <Pressable className="absolute inset-0" onPress={onClose} />
 
         <View
@@ -98,8 +100,8 @@ export default function TaskDetailModalMobile({ visible, onClose, height, data }
           style={{
             maxHeight: Math.round(height * 0.92),
             borderWidth: 1,
-            borderColor: 'rgba(214,235,253,0.26)',
-            backgroundColor: 'rgba(19,19,19,0.90)',
+            borderColor: palette.borderStrong,
+            backgroundColor: palette.modalBackground,
             shadowColor: '#000',
             shadowOpacity: 0.35,
             shadowRadius: 20,
@@ -110,18 +112,18 @@ export default function TaskDetailModalMobile({ visible, onClose, height, data }
             <View className="h-1.5 w-12 rounded-full bg-white/30" />
           </View>
 
-          <SafeAreaView className="flex-1 bg-[rgba(19,19,19,0.78)]">
+          <SafeAreaView className="flex-1" style={{ backgroundColor: palette.surface }}>
             <View
               className="h-14 flex-row items-center justify-between px-3.5"
               style={{
                 borderBottomWidth: 1,
-                borderBottomColor: 'rgba(214,235,253,0.16)',
-                backgroundColor: 'rgba(25,25,25,0.84)',
+                borderBottomColor: palette.border,
+                backgroundColor: palette.surfaceAlt,
               }}
             >
-              <Text className="font-section text-[20px] tracking-[0.2px] text-void-text-primary">Task Details</Text>
+              <Text className="font-section text-[20px] tracking-[0.2px]" style={{ color: palette.textPrimary }}>Task Details</Text>
               <Pressable onPress={onClose} className="items-center justify-center px-1 py-1">
-                <Ionicons name="close" size={18} color="#f0f0f0" />
+                <Ionicons name="close" size={18} color={palette.textPrimary} />
               </Pressable>
             </View>
 

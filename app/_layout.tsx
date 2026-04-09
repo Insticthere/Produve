@@ -1,9 +1,5 @@
 ﻿import FontAwesome from "@expo/vector-icons/FontAwesome";
-import {
-  DarkTheme,
-  Theme,
-  ThemeProvider,
-} from "@react-navigation/native";
+import { ThemeProvider } from "@react-navigation/native";
 import { useFonts } from "expo-font";
 import {
   Inter_400Regular,
@@ -28,6 +24,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import "../global.css";
 import ToastViewport from "@/components/ui/ToastViewport";
+import { AppThemeProvider, useAppTheme } from "@/lib/theme";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -75,21 +72,18 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const nocturnalTheme: Theme = {
-    ...DarkTheme,
-    dark: true,
-    colors: {
-      ...DarkTheme.colors,
-      primary: "#70b1ff",
-      background: "#0e0e0e",
-      card: "#131313",
-      text: "#f0f0f0",
-      border: "rgba(214,235,253,0.19)",
-      notification: "#ff716c",
-    },
-  };
   return (
-    <ThemeProvider value={nocturnalTheme}>
+    <AppThemeProvider>
+      <RootNavigator />
+    </AppThemeProvider>
+  );
+}
+
+function RootNavigator() {
+  const { navigationTheme } = useAppTheme();
+
+  return (
+    <ThemeProvider value={navigationTheme}>
       <>
         <Stack>
           <Stack.Screen name="auth" options={{ headerShown: false }} />

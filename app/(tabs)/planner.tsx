@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Modal,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import clsx from 'clsx';
 import PageScroll from '@/components/ui/PageScroll';
+import { useAppTheme } from '@/lib/theme';
 
 const START_HOUR = 6;
 const END_HOUR = 22;
@@ -94,6 +95,7 @@ function PlannerBlock({
   onDrop: (id: string, deltaSlots: number) => void;
   onOpen: (block: PlannerBlockData) => void;
 }) {
+  const { palette } = useAppTheme();
   const panY = useRef(new Animated.Value(0)).current;
   const panResponder = useMemo(
     () =>
@@ -133,8 +135,8 @@ function PlannerBlock({
           backgroundColor: `${block.color}22`,
         }}
       >
-        <Text className="font-body text-[13px] text-white">{block.title}</Text>
-        <Text className="mt-1 font-mono text-[10px] text-void-text-secondary">
+        <Text className="font-body text-[13px]" style={{ color: palette.textPrimary }}>{block.title}</Text>
+        <Text className="mt-1 font-mono text-[10px]" style={{ color: palette.textSecondary }}>
           {toClock(block.startSlot)} - {toClock(block.startSlot + block.durationSlots)}
         </Text>
       </View>
@@ -143,6 +145,7 @@ function PlannerBlock({
 }
 
 export default function PlannerScreen() {
+  const { palette } = useAppTheme();
   const [blocks, setBlocks] = useState(INITIAL_BLOCKS);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMonth, setViewMonth] = useState(new Date());
@@ -230,32 +233,32 @@ export default function PlannerScreen() {
   };
 
   return (
-    <SafeAreaView className="min-h-0 flex-1 bg-[#0e0e0e]">
+    <SafeAreaView className="min-h-0 flex-1" style={{ backgroundColor: palette.background }}>
       <Animated.View style={{ opacity: fade }} className="min-h-0 flex-1">
         <PageScroll>
           <View className="mb-6">
-            <Text className="font-mono text-[10px] uppercase tracking-[1.2px] text-[#70b1ff]">Produve</Text>
-            <Text className="mt-1 font-display text-[46px] leading-[48px] text-void-text-primary">Planner</Text>
-            <Text className="mt-2 font-body text-[14px] text-void-text-secondary">
+            <Text className="font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.primary }}>Produve</Text>
+            <Text className="mt-1 font-display text-[46px] leading-[48px]" style={{ color: palette.textPrimary }}>Planner</Text>
+            <Text className="mt-2 font-body text-[14px]" style={{ color: palette.textSecondary }}>
               15-minute planning grid with old-date calendar selection.
             </Text>
           </View>
 
           <View className="mb-2 flex-row items-center gap-2">
-            <Pressable onPress={() => shiftDay(-1)} className="rounded-full border border-white/20 px-3 py-1.5">
-              <Text className="font-mono text-[10px] text-white">Prev Day</Text>
+            <Pressable onPress={() => shiftDay(-1)} className="rounded-full border px-3 py-1.5" style={{ borderColor: palette.borderStrong }}>
+              <Text className="font-mono text-[10px]" style={{ color: palette.textPrimary }}>Prev Day</Text>
             </Pressable>
-            <Pressable onPress={() => shiftDay(1)} className="rounded-full border border-white/20 px-3 py-1.5">
-              <Text className="font-mono text-[10px] text-white">Next Day</Text>
+            <Pressable onPress={() => shiftDay(1)} className="rounded-full border px-3 py-1.5" style={{ borderColor: palette.borderStrong }}>
+              <Text className="font-mono text-[10px]" style={{ color: palette.textPrimary }}>Next Day</Text>
             </Pressable>
-            <Pressable onPress={() => setShowCalendarModal(true)} className="rounded-full border border-white/20 px-3 py-1.5">
-              <Text className="font-mono text-[10px] text-white">Calendar</Text>
+            <Pressable onPress={() => setShowCalendarModal(true)} className="rounded-full border px-3 py-1.5" style={{ borderColor: palette.borderStrong }}>
+              <Text className="font-mono text-[10px]" style={{ color: palette.textPrimary }}>Calendar</Text>
             </Pressable>
-            <Pressable onPress={() => setShowAddModal(true)} className="ml-auto rounded-full bg-[#4ea4ff] px-4 py-2">
-              <Text className="font-body text-[12px] text-[#001b32]">Add Session</Text>
+            <Pressable onPress={() => setShowAddModal(true)} className="ml-auto rounded-full px-4 py-2" style={{ backgroundColor: palette.primary }}>
+              <Text className="font-body text-[12px]" style={{ color: palette.dark ? '#001b32' : '#ffffff' }}>Add Session</Text>
             </Pressable>
           </View>
-          <Text className="mb-4 font-mono text-[10px] text-void-text-secondary">{toDateLabel(selectedDate)}</Text>
+          <Text className="mb-4 font-mono text-[10px]" style={{ color: palette.textSecondary }}>{toDateLabel(selectedDate)}</Text>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
             <View className="flex-row gap-2">
@@ -266,10 +269,10 @@ export default function PlannerScreen() {
                     const diff = idx - selectedDay;
                     shiftDay(diff);
                   }}
-                  className={clsx('rounded-full border px-3 py-1.5', selectedDay === idx ? 'bg-[#4ea4ff30]' : 'bg-[rgba(19,19,19,0.78)]')}
+                  className="rounded-full border px-3 py-1.5"
                   style={{ borderColor: selectedDay === idx ? 'rgba(78,164,255,0.65)' : 'rgba(214,235,253,0.2)' }}
                 >
-                  <Text className={clsx('font-mono text-[10px]', selectedDay === idx ? 'text-[#70b1ff]' : 'text-void-text-secondary')}>
+                  <Text className="font-mono text-[10px]" style={{ color: selectedDay === idx ? palette.primary : palette.textSecondary }}>
                     {d}
                   </Text>
                 </Pressable>
@@ -278,17 +281,17 @@ export default function PlannerScreen() {
           </ScrollView>
 
           <View className="mb-4 flex-row gap-2">
-            <Pressable onPress={() => setView('day')} className={clsx('rounded-full px-3 py-1.5', view === 'day' ? 'bg-[#4ea4ff]' : 'bg-[rgba(19,19,19,0.78)]')}>
-              <Text className={clsx('font-mono text-[10px]', view === 'day' ? 'text-[#001b32]' : 'text-void-text-secondary')}>Day View</Text>
+            <Pressable onPress={() => setView('day')} className="rounded-full px-3 py-1.5" style={{ backgroundColor: view === 'day' ? palette.primary : palette.surface }}>
+              <Text className="font-mono text-[10px]" style={{ color: view === 'day' ? (palette.dark ? '#001b32' : '#ffffff') : palette.textSecondary }}>Day View</Text>
             </Pressable>
-            <Pressable onPress={() => setView('week')} className={clsx('rounded-full px-3 py-1.5', view === 'week' ? 'bg-[#4ea4ff]' : 'bg-[rgba(19,19,19,0.78)]')}>
-              <Text className={clsx('font-mono text-[10px]', view === 'week' ? 'text-[#001b32]' : 'text-void-text-secondary')}>Week View</Text>
+            <Pressable onPress={() => setView('week')} className="rounded-full px-3 py-1.5" style={{ backgroundColor: view === 'week' ? palette.primary : palette.surface }}>
+              <Text className="font-mono text-[10px]" style={{ color: view === 'week' ? (palette.dark ? '#001b32' : '#ffffff') : palette.textSecondary }}>Week View</Text>
             </Pressable>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} className="ml-2">
               <View className="flex-row gap-2">
                 {(['all', 'focus', 'revision', 'practice', 'break'] as const).map((f) => (
-                  <Pressable key={f} onPress={() => setFilter(f)} className={clsx('rounded-full border px-3 py-1.5', filter === f ? 'bg-white/10' : 'bg-transparent')} style={{ borderColor: 'rgba(214,235,253,0.2)' }}>
-                    <Text className={clsx('font-mono text-[10px] uppercase', filter === f ? 'text-white' : 'text-void-text-secondary')}>{f}</Text>
+                  <Pressable key={f} onPress={() => setFilter(f)} className="rounded-full border px-3 py-1.5" style={{ borderColor: palette.border, backgroundColor: filter === f ? palette.primarySoft : 'transparent' }}>
+                    <Text className="font-mono text-[10px] uppercase" style={{ color: filter === f ? palette.primary : palette.textSecondary }}>{f}</Text>
                   </Pressable>
                 ))}
               </View>
@@ -296,11 +299,11 @@ export default function PlannerScreen() {
           </View>
 
           {view === 'day' ? (
-            <View className="rounded-[18px] bg-[rgba(19,19,19,0.78)] p-3" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.2)' }}>
+            <View className="rounded-[18px] p-3" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface }}>
               <View style={{ height: TOTAL_SLOTS * SLOT_HEIGHT + 8, position: 'relative' }}>
                 {labels.map((label, i) => (
                   <View key={label + i} style={{ position: 'absolute', left: 0, right: 0, top: i * SLOT_HEIGHT, height: SLOT_HEIGHT }}>
-                    <Text className="absolute left-2 top-0 font-mono text-[9px] text-void-text-tertiary">{label}</Text>
+                    <Text className="absolute left-2 top-0 font-mono text-[10px]" style={{ color: palette.textTertiary }}>{label}</Text>
                     <View style={{ position: 'absolute', left: 74, right: 6, top: SLOT_HEIGHT / 2, height: 1, backgroundColor: i % 4 === 0 ? 'rgba(214,235,253,0.18)' : 'rgba(214,235,253,0.08)' }} />
                   </View>
                 ))}
@@ -313,13 +316,13 @@ export default function PlannerScreen() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View className="flex-row gap-3">
                 {weekSummary.map((day, idx) => (
-                  <View key={day.label} className="w-[240px] rounded-[16px] bg-[rgba(19,19,19,0.78)] p-3" style={{ borderWidth: 1, borderColor: idx === selectedDay ? 'rgba(78,164,255,0.5)' : 'rgba(214,235,253,0.2)' }}>
-                    <Text className="font-mono text-[11px] uppercase text-void-text-secondary">{day.label}</Text>
+                  <View key={day.label} className="w-[240px] rounded-[16px] p-3" style={{ borderWidth: 1, borderColor: idx === selectedDay ? `${palette.primary}80` : palette.border, backgroundColor: palette.surface }}>
+                    <Text className="font-mono text-[10px] uppercase" style={{ color: palette.textSecondary }}>{day.label}</Text>
                     <View className="mt-2 gap-2">
-                      {day.items.length === 0 ? <Text className="font-body text-[12px] text-void-text-tertiary">No sessions</Text> : day.items.map((b) => (
+                      {day.items.length === 0 ? <Text className="font-body text-[12px]" style={{ color: palette.textTertiary }}>No sessions</Text> : day.items.map((b) => (
                         <Pressable key={b.id} onPress={() => { setSelectedBlock(b); setShowBlockModal(true); }} className="rounded-[12px] p-2" style={{ borderWidth: 1, borderColor: `${b.color}66`, backgroundColor: `${b.color}1f` }}>
-                          <Text className="font-body text-[12px] text-white">{b.title}</Text>
-                          <Text className="mt-1 font-mono text-[10px] text-void-text-secondary">{toClock(b.startSlot)} - {b.durationSlots * SLOT_MINUTES}m</Text>
+                          <Text className="font-body text-[12px]" style={{ color: palette.textPrimary }}>{b.title}</Text>
+                          <Text className="mt-1 font-mono text-[10px]" style={{ color: palette.textSecondary }}>{toClock(b.startSlot)} - {b.durationSlots * SLOT_MINUTES}m</Text>
                         </Pressable>
                       ))}
                     </View>
@@ -332,21 +335,21 @@ export default function PlannerScreen() {
       </Animated.View>
 
       <Modal visible={showCalendarModal} transparent animationType="fade" onRequestClose={() => setShowCalendarModal(false)}>
-        <View className="flex-1 items-center justify-center bg-black/70 p-5">
+        <View className="flex-1 items-center justify-center p-5" style={{ backgroundColor: palette.overlay }}>
           <Pressable className="absolute inset-0" onPress={() => setShowCalendarModal(false)} />
-          <View className="w-full max-w-[520px] rounded-[20px] bg-[rgba(19,19,19,0.78)] p-5" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.22)' }}>
+          <View className="w-full max-w-[520px] rounded-[20px] p-5" style={{ borderWidth: 1, borderColor: palette.borderStrong, backgroundColor: palette.modalBackground }}>
             <View className="flex-row items-center justify-between">
-              <Pressable onPress={() => setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))} className="rounded-full border border-white/20 px-3 py-1.5">
-                <Text className="font-mono text-[10px] text-white">Prev</Text>
+              <Pressable onPress={() => setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))} className="rounded-full border px-3 py-1.5" style={{ borderColor: palette.borderStrong }}>
+                <Text className="font-mono text-[10px]" style={{ color: palette.textPrimary }}>Prev</Text>
               </Pressable>
-              <Text className="font-section text-[20px] text-white">{MONTHS[viewMonth.getMonth()]} {viewMonth.getFullYear()}</Text>
-              <Pressable onPress={() => setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))} className="rounded-full border border-white/20 px-3 py-1.5">
-                <Text className="font-mono text-[10px] text-white">Next</Text>
+              <Text className="font-section text-[20px]" style={{ color: palette.textPrimary }}>{MONTHS[viewMonth.getMonth()]} {viewMonth.getFullYear()}</Text>
+              <Pressable onPress={() => setViewMonth((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))} className="rounded-full border px-3 py-1.5" style={{ borderColor: palette.borderStrong }}>
+                <Text className="font-mono text-[10px]" style={{ color: palette.textPrimary }}>Next</Text>
               </Pressable>
             </View>
             <View className="mt-4 flex-row justify-between">
               {WEEK_DAYS.map((d) => (
-                <Text key={d} className="w-[13%] text-center font-mono text-[10px] text-void-text-secondary">{d}</Text>
+                <Text key={d} className="w-[13%] text-center font-mono text-[10px]" style={{ color: palette.textSecondary }}>{d}</Text>
               ))}
             </View>
             <View className="mt-2 flex-row flex-wrap">
@@ -364,7 +367,7 @@ export default function PlannerScreen() {
                       )}
                       style={{ borderWidth: 1, borderColor: cell.date.toDateString() === selectedDate.toDateString() ? 'rgba(78,164,255,0.7)' : 'rgba(214,235,253,0.14)' }}
                     >
-                      <Text className={clsx('font-mono text-[11px]', cell.date.toDateString() === selectedDate.toDateString() ? 'text-[#70b1ff]' : 'text-white')}>{cell.day}</Text>
+                      <Text className="font-mono text-[10px]" style={{ color: cell.date.toDateString() === selectedDate.toDateString() ? palette.primary : palette.textPrimary }}>{cell.day}</Text>
                     </Pressable>
                   ) : (
                     <View className="py-2" />
@@ -377,13 +380,13 @@ export default function PlannerScreen() {
       </Modal>
 
       <Modal visible={showBlockModal} transparent animationType="fade" onRequestClose={() => setShowBlockModal(false)}>
-        <View className="flex-1 items-center justify-center bg-black/70 p-5">
+        <View className="flex-1 items-center justify-center p-5" style={{ backgroundColor: palette.overlay }}>
           <Pressable className="absolute inset-0" onPress={() => setShowBlockModal(false)} />
           {selectedBlock ? (
-            <View className="w-full max-w-[480px] rounded-[20px] bg-[rgba(19,19,19,0.78)] p-5" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.22)' }}>
-              <Text className="font-mono text-[10px] uppercase text-[#70b1ff]">{WEEK_DAYS[selectedBlock.day]}</Text>
-              <Text className="mt-1 font-section text-[24px] text-white">{selectedBlock.title}</Text>
-              <Text className="mt-1 font-body text-[13px] text-void-text-secondary">{toClock(selectedBlock.startSlot)} - {toClock(selectedBlock.startSlot + selectedBlock.durationSlots)} - {selectedBlock.category}</Text>
+            <View className="w-full max-w-[480px] rounded-[20px] p-5" style={{ borderWidth: 1, borderColor: palette.borderStrong, backgroundColor: palette.modalBackground }}>
+              <Text className="font-mono text-[10px] uppercase" style={{ color: palette.primary }}>{WEEK_DAYS[selectedBlock.day]}</Text>
+              <Text className="mt-1 font-section text-[24px]" style={{ color: palette.textPrimary }}>{selectedBlock.title}</Text>
+              <Text className="mt-1 font-body text-[13px]" style={{ color: palette.textSecondary }}>{toClock(selectedBlock.startSlot)} - {toClock(selectedBlock.startSlot + selectedBlock.durationSlots)} - {selectedBlock.category}</Text>
               <View className="mt-4 flex-row gap-2">
                 <Pressable onPress={() => toggleDone(selectedBlock.id)} className="rounded-full bg-[#4ea4ff] px-4 py-2.5">
                   <Text className="font-body text-[12px] text-[#001b32]">{selectedBlock.done ? 'Mark Pending' : 'Mark Done'}</Text>
@@ -398,11 +401,11 @@ export default function PlannerScreen() {
       </Modal>
 
       <Modal visible={showAddModal} transparent animationType="fade" onRequestClose={() => setShowAddModal(false)}>
-        <View className="flex-1 items-center justify-center bg-black/70 p-5">
+        <View className="flex-1 items-center justify-center p-5" style={{ backgroundColor: palette.overlay }}>
           <Pressable className="absolute inset-0" onPress={() => setShowAddModal(false)} />
-          <View className="w-full max-w-[480px] rounded-[20px] bg-[rgba(19,19,19,0.78)] p-5" style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.22)' }}>
-            <Text className="font-mono text-[10px] uppercase text-[#70b1ff]">Add Session</Text>
-            <Text className="mt-1 font-section text-[20px] text-white">{toDateLabel(selectedDate)}</Text>
+          <View className="w-full max-w-[480px] rounded-[20px] p-5" style={{ borderWidth: 1, borderColor: palette.borderStrong, backgroundColor: palette.modalBackground }}>
+            <Text className="font-mono text-[10px] uppercase" style={{ color: palette.primary }}>Add Session</Text>
+            <Text className="mt-1 font-section text-[20px]" style={{ color: palette.textPrimary }}>{toDateLabel(selectedDate)}</Text>
             <View className="mt-4 gap-2">
               <TextInput value={newTitle} onChangeText={setNewTitle} placeholder="Session title" placeholderTextColor="#6f767a" className="rounded-full border border-white/20 bg-[#0f1113] px-4 py-2.5 text-white" />
               <View className="flex-row gap-2">
@@ -412,8 +415,8 @@ export default function PlannerScreen() {
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 <View className="flex-row gap-2">
                   {(['focus', 'revision', 'practice', 'break'] as const).map((c) => (
-                    <Pressable key={c} onPress={() => setNewCategory(c)} className={clsx('rounded-full border px-3 py-1.5', newCategory === c ? 'bg-white/10' : '')} style={{ borderColor: 'rgba(214,235,253,0.25)' }}>
-                      <Text className="font-mono text-[10px] uppercase text-white">{c}</Text>
+                    <Pressable key={c} onPress={() => setNewCategory(c)} className={clsx('rounded-full border px-3 py-1.5', newCategory === c ? 'bg-[#4ea4ff20]' : '')} style={{ borderColor: 'rgba(214,235,253,0.25)' }}>
+                      <Text className="font-mono text-[10px] uppercase" style={{ color: palette.textPrimary }}>{c}</Text>
                     </Pressable>
                   ))}
                 </View>
@@ -428,6 +431,7 @@ export default function PlannerScreen() {
     </SafeAreaView>
   );
 }
+
 
 
 

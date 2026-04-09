@@ -1,12 +1,25 @@
-﻿import React, { useMemo, useState, ReactNode } from 'react';
+import React, { ReactNode, useMemo, useState } from 'react';
 import { View, Text, ScrollView, Pressable, SafeAreaView, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import clsx from 'clsx';
 import TaskDetailModalDesktop from '@/components/modals/TaskDetailModalDesktop';
 import TaskDetailModalMobile from '@/components/modals/TaskDetailModalMobile';
 import PageScroll from '@/components/ui/PageScroll';
+import { useAppTheme } from '@/lib/theme';
 
-const MOCK_TASKS = [
+type TaskItem = {
+  id: string;
+  title: string;
+  status: 'todo' | 'completed';
+  priority: 'High' | 'Medium' | 'Low';
+  subject?: string;
+  chapter?: string;
+  subtopic?: string;
+  deadline?: string;
+  subtasks: { id: string; title: string; completed: boolean }[];
+};
+
+const MOCK_TASKS: TaskItem[] = [
   {
     id: '1',
     title: 'Deep Work Session: UI Architecture',
@@ -43,52 +56,73 @@ const MOCK_TASKS = [
   },
 ];
 
-const Badge = ({ children, variant }: { children: ReactNode; variant: string }) => {
+function Badge({ children, variant }: { children: ReactNode; variant: string }) {
+  const { palette } = useAppTheme();
   const isSubject = variant === 'subject';
   const isHigh = variant === 'High';
 
+  const borderColor = isSubject ? `${palette.primary}66` : isHigh ? `${palette.danger}66` : `${palette.primary}44`;
+  const backgroundColor = isSubject ? `${palette.primary}1f` : isHigh ? `${palette.danger}1f` : palette.primarySoft;
+  const color = isSubject ? palette.primary : isHigh ? palette.danger : palette.textSecondary;
+
   return (
-    <View
-      className={clsx('rounded-full border px-2 py-0.5', isSubject ? 'border-[#4ea4ff66] bg-[#4ea4ff1f]' : isHigh ? 'border-[#ff716c66] bg-[#ff716c1f]' : 'border-[#ffb46e66] bg-[#ffb46e1f]')}
-    >
-      <Text className={clsx('font-mono text-[10px]', isSubject ? 'text-[#70b1ff]' : isHigh ? 'text-[#ff716c]' : 'text-[#ffb46e]')}>
+    <View className="rounded-full border px-2 py-0.5" style={{ borderColor, backgroundColor }}>
+      <Text className="font-mono text-[10px]" style={{ color }}>
         {children}
       </Text>
     </View>
   );
-};
+}
 
-const TaskCard = ({
+function TaskCard({
   task,
   onOpenDetails,
 }: {
-  task: typeof MOCK_TASKS[0];
-  onOpenDetails: (task: typeof MOCK_TASKS[0]) => void;
-}) => {
+  task: TaskItem;
+  onOpenDetails: (task: TaskItem) => void;
+}) {
+  const { palette } = useAppTheme();
   const [expanded, setExpanded] = useState(false);
   const isCompleted = task.status === 'completed';
+
   const progress =
-    task.subtasks.length > 0 ? (task.subtasks.filter((st) => st.completed).length / task.subtasks.length) * 100 : isCompleted ? 100 : 0;
+    task.subtasks.length > 0
+      ? (task.subtasks.filter((st) => st.completed).length / task.subtasks.length) * 100
+      : isCompleted
+      ? 100
+      : 0;
+
+  const cardBg = isCompleted ? palette.surfaceAlt : palette.surface;
+  const cardText = isCompleted ? palette.textSecondary : palette.textPrimary;
 
   return (
     <View
-      className={clsx('relative mb-4 overflow-hidden rounded-[16px] bg-[rgba(19,19,19,0.78)] p-5', isCompleted && 'opacity-55')}
-      style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.19)' }}
+      className="relative mb-4 overflow-hidden rounded-[16px] p-5"
+      style={{
+        borderWidth: 1,
+        borderColor: palette.border,
+        backgroundColor: cardBg,
+        opacity: isCompleted ? 0.82 : 1,
+      }}
     >
-      <View className="absolute left-0 top-0 h-[2px] bg-[#4ea4ff]" style={{ width: `${progress}%` }} />
+      <View className="absolute left-0 top-0 h-[2px]" style={{ width: `${progress}%`, backgroundColor: palette.primary }} />
 
       <View className="flex-row items-start gap-4">
         <Pressable
-          className={clsx(
-            'mt-1 h-5 w-5 items-center justify-center rounded-[4px] border',
-            isCompleted ? 'border-[#70b1ff] bg-[#70b1ff]' : 'border-white/25'
-          )}
+          className="mt-1 h-5 w-5 items-center justify-center rounded-[4px] border"
+          style={{
+            borderColor: isCompleted ? palette.primary : palette.borderStrong,
+            backgroundColor: isCompleted ? palette.primary : 'transparent',
+          }}
         >
-          {isCompleted && <Ionicons name="checkmark" size={12} color="#0e0e0e" />}
+          {isCompleted && <Ionicons name="checkmark" size={12} color={palette.dark ? '#0e0e0e' : '#ffffff'} />}
         </Pressable>
 
         <View className="flex-1">
-          <Text className={clsx('mb-2 font-section text-[18px] leading-6 tracking-tight text-void-text-primary', isCompleted && 'line-through text-void-text-secondary')}>
+          <Text
+            className={clsx('mb-2 font-section text-[18px] leading-6 tracking-tight', isCompleted && 'line-through')}
+            style={{ color: cardText }}
+          >
             {task.title}
           </Text>
 
@@ -97,36 +131,47 @@ const TaskCard = ({
             <Badge variant={task.priority}>{task.priority} Priority</Badge>
             <Pressable
               onPress={() => onOpenDetails(task)}
-              className="rounded-full border border-[rgba(214,235,253,0.28)] px-2 py-0.5"
+              className="rounded-full border px-2 py-0.5"
+              style={{ borderColor: palette.borderStrong, backgroundColor: palette.surfaceAlt }}
             >
-              <Text className="font-mono text-[10px] text-void-text-secondary">Open Details</Text>
+              <Text className="font-mono text-[10px]" style={{ color: palette.textSecondary }}>
+                Open Details
+              </Text>
             </Pressable>
           </View>
 
           {(task.chapter || task.subtopic || task.deadline) && (
-            <View className="mt-1 flex-row flex-wrap border-t border-white/10 pt-3">
+            <View className="mt-1 flex-row flex-wrap border-t pt-3" style={{ borderTopColor: palette.border }}>
               {task.chapter && (
                 <View className="mb-2 mr-4">
-                  <Text className="font-mono text-[9px] uppercase text-void-text-tertiary">Chapter</Text>
-                  <Text className="font-body text-[12px] text-void-text-secondary">{task.chapter}</Text>
+                  <Text className="font-mono text-[9px] uppercase" style={{ color: palette.textTertiary }}>
+                    Chapter
+                  </Text>
+                  <Text className="font-body text-[12px]" style={{ color: palette.textSecondary }}>
+                    {task.chapter}
+                  </Text>
                 </View>
               )}
               {task.deadline && (
                 <View>
-                  <Text className="font-mono text-[9px] uppercase text-void-text-tertiary">Deadline</Text>
-                  <Text className="font-mono text-[11px] text-[#ff716c]">{task.deadline.replace('T', ' ')}</Text>
+                  <Text className="font-mono text-[9px] uppercase" style={{ color: palette.textTertiary }}>
+                    Deadline
+                  </Text>
+                  <Text className="font-mono text-[11px]" style={{ color: palette.danger }}>
+                    {task.deadline.replace('T', ' ')}
+                  </Text>
                 </View>
               )}
             </View>
           )}
 
           {task.subtasks.length > 0 && (
-            <View className="mt-2 border-t border-white/10 pt-3">
+            <View className="mt-2 border-t pt-3" style={{ borderTopColor: palette.border }}>
               <Pressable onPress={() => setExpanded(!expanded)} className="flex-row items-center justify-between">
-                <Text className="font-body text-[12px] text-void-text-secondary">
+                <Text className="font-body text-[12px]" style={{ color: palette.textSecondary }}>
                   Subtasks ({task.subtasks.filter((st) => st.completed).length}/{task.subtasks.length})
                 </Text>
-                <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={14} color="#a1a4a5" />
+                <Ionicons name={expanded ? 'chevron-up' : 'chevron-down'} size={14} color={palette.textSecondary} />
               </Pressable>
 
               {expanded && (
@@ -134,14 +179,18 @@ const TaskCard = ({
                   {task.subtasks.map((subtask) => (
                     <View key={subtask.id} className="flex-row items-center gap-3">
                       <View
-                        className={clsx(
-                          'h-3 w-3 rounded-[2px] border',
-                          subtask.completed ? 'border-[#70b1ff] bg-[#70b1ff]' : 'border-white/25'
-                        )}
+                        className="h-3 w-3 rounded-[2px] border"
+                        style={{
+                          borderColor: subtask.completed ? palette.primary : palette.borderStrong,
+                          backgroundColor: subtask.completed ? palette.primary : 'transparent',
+                        }}
                       >
-                        {subtask.completed && <Ionicons name="checkmark" size={8} color="#0e0e0e" />}
+                        {subtask.completed && <Ionicons name="checkmark" size={8} color={palette.dark ? '#0e0e0e' : '#ffffff'} />}
                       </View>
-                      <Text className={clsx('font-body text-[13px]', subtask.completed ? 'text-void-text-tertiary line-through' : 'text-void-text-secondary')}>
+                      <Text
+                        className={clsx('font-body text-[13px]', subtask.completed && 'line-through')}
+                        style={{ color: subtask.completed ? palette.textTertiary : palette.textSecondary }}
+                      >
                         {subtask.title}
                       </Text>
                     </View>
@@ -154,14 +203,15 @@ const TaskCard = ({
       </View>
     </View>
   );
-};
+}
 
 export default function TodoScreen() {
+  const { palette } = useAppTheme();
   const { width, height } = useWindowDimensions();
   const isDesktop = width >= 1024;
   const [filter, setFilter] = useState('all');
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<(typeof MOCK_TASKS)[0] | null>(null);
+  const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
 
   const stats = useMemo(() => {
     const pending = MOCK_TASKS.filter((t) => t.status !== 'completed').length;
@@ -176,65 +226,64 @@ export default function TodoScreen() {
     return result;
   }, [filter]);
 
-  const handleOpenDetails = (task: (typeof MOCK_TASKS)[0]) => {
+  const handleOpenDetails = (task: TaskItem) => {
     setSelectedTask(task);
     setIsDetailOpen(true);
   };
 
   return (
-    <SafeAreaView className="min-h-0 flex-1 bg-[#0e0e0e]">
+    <SafeAreaView className="min-h-0 flex-1" style={{ backgroundColor: palette.background }}>
       <PageScroll>
         <View className="mb-10">
-          <Text className="mb-1 font-mono text-[10px] uppercase tracking-[1.2px] text-[#70b1ff]">Produve</Text>
-          <Text className="mb-2 font-display text-[56px] leading-none tracking-tighter text-void-text-primary">Overview</Text>
-          <Text className="max-w-[280px] font-section text-[16px] leading-tight text-void-text-secondary">
+          <Text className="mb-1 font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.primary }}>
+            Produve
+          </Text>
+          <Text className="mb-2 font-display text-[56px] leading-none tracking-tighter" style={{ color: palette.textPrimary }}>
+            Overview
+          </Text>
+          <Text className="max-w-[280px] font-section text-[16px] leading-tight" style={{ color: palette.textSecondary }}>
             Track and manage your deep work sessions in the nocturnal grid.
           </Text>
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-8 flex-row gap-3">
-          <View
-            className="mr-3 flex-row items-center rounded-full px-4 py-2"
-            style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.19)' }}
-          >
-            <View className="mr-3 h-6 w-6 items-center justify-center rounded-full bg-[#4ea4ff33]">
-              <Ionicons name="list" size={14} color="#70b1ff" />
+          <View className="mr-3 flex-row items-center rounded-full px-4 py-2" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface }}>
+            <View className="mr-3 h-6 w-6 items-center justify-center rounded-full" style={{ backgroundColor: `${palette.primary}33` }}>
+              <Ionicons name="list" size={14} color={palette.primary} />
             </View>
             <View className="flex-row items-center gap-1">
-              <Text className="font-mono text-[14px] text-void-text-primary">{stats.pending}</Text>
-              <Text className="font-body text-[12px] text-void-text-secondary">Pending</Text>
+              <Text className="font-mono text-[14px]" style={{ color: palette.textPrimary }}>{stats.pending}</Text>
+              <Text className="font-body text-[12px]" style={{ color: palette.textSecondary }}>Pending</Text>
             </View>
           </View>
 
-          <View
-            className="mr-3 flex-row items-center rounded-full px-4 py-2"
-            style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.19)' }}
-          >
-            <View className="mr-3 h-6 w-6 items-center justify-center rounded-full bg-[#ff716c33]">
-              <Ionicons name="flame" size={14} color="#ff716c" />
+          <View className="mr-3 flex-row items-center rounded-full px-4 py-2" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surface }}>
+            <View className="mr-3 h-6 w-6 items-center justify-center rounded-full" style={{ backgroundColor: `${palette.danger}33` }}>
+              <Ionicons name="flame" size={14} color={palette.danger} />
             </View>
             <View className="flex-row items-center gap-1">
-              <Text className="font-mono text-[14px] text-void-text-primary">{stats.urgent}</Text>
-              <Text className="font-body text-[12px] text-void-text-secondary">Urgent</Text>
+              <Text className="font-mono text-[14px]" style={{ color: palette.textPrimary }}>{stats.urgent}</Text>
+              <Text className="font-body text-[12px]" style={{ color: palette.textSecondary }}>Urgent</Text>
             </View>
           </View>
         </ScrollView>
 
-        <View
-          className="mb-8 w-[260px] flex-row rounded-full p-1"
-          style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.19)', backgroundColor: 'rgba(19,19,19,0.78)' }}
-        >
-          {['all', 'todo', 'completed'].map((f) => (
-            <Pressable
-              key={f}
-              onPress={() => setFilter(f)}
-              className={clsx('flex-1 items-center justify-center rounded-full py-1.5', filter === f ? 'bg-white/10' : '')}
-            >
-              <Text className={clsx('font-body text-[13px] capitalize', filter === f ? 'text-void-text-primary' : 'text-void-text-secondary')}>
-                {f}
-              </Text>
-            </Pressable>
-          ))}
+        <View className="mb-8 w-[260px] flex-row rounded-full p-1" style={{ borderWidth: 1, borderColor: palette.border, backgroundColor: palette.surfaceAlt }}>
+          {['all', 'todo', 'completed'].map((f) => {
+            const active = filter === f;
+            return (
+              <Pressable
+                key={f}
+                onPress={() => setFilter(f)}
+                className="flex-1 items-center justify-center rounded-full py-1.5"
+                style={{ backgroundColor: active ? palette.primarySoft : 'transparent' }}
+              >
+                <Text className="font-body text-[13px] capitalize" style={{ color: active ? palette.primary : palette.textSecondary }}>
+                  {f}
+                </Text>
+              </Pressable>
+            );
+          })}
         </View>
 
         <View>
@@ -255,7 +304,10 @@ export default function TodoScreen() {
               ? {
                   id: `TASK-${selectedTask.id.padStart(4, '0')}`,
                   title: selectedTask.title,
-                  priorityLabel: selectedTask.priority === 'High' ? 'High Priority' : `${selectedTask.priority} Priority`,
+                  priorityLabel:
+                    selectedTask.priority === 'High'
+                      ? 'High Priority'
+                      : `${selectedTask.priority} Priority`,
                   subject: selectedTask.subject ?? 'Design Systems',
                   chapter: selectedTask.chapter ?? 'Visual Physics',
                 }
@@ -272,7 +324,10 @@ export default function TodoScreen() {
               ? {
                   id: `TASK-${selectedTask.id.padStart(4, '0')}`,
                   title: selectedTask.title,
-                  priorityLabel: selectedTask.priority === 'High' ? 'High Priority' : `${selectedTask.priority} Priority`,
+                  priorityLabel:
+                    selectedTask.priority === 'High'
+                      ? 'High Priority'
+                      : `${selectedTask.priority} Priority`,
                   subject: selectedTask.subject ?? 'Design Systems',
                   chapter: selectedTask.chapter ?? 'Visual Physics',
                 }
@@ -283,6 +338,3 @@ export default function TodoScreen() {
     </SafeAreaView>
   );
 }
-
-
-

@@ -1,7 +1,8 @@
-﻿import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import React from 'react';
 import { Animated, Pressable, Text, View } from 'react-native';
+import { useAppTheme } from '@/lib/theme';
 
 function getLabel(tabBarLabel: unknown, title: unknown, routeName: string) {
   if (typeof tabBarLabel === 'string') return tabBarLabel;
@@ -14,6 +15,7 @@ export default function WebTopMenuTabBar({
   descriptors,
   navigation,
 }: BottomTabBarProps) {
+  const { palette } = useAppTheme();
   const [open, setOpen] = React.useState(false);
   const anim = React.useRef(new Animated.Value(0)).current;
 
@@ -33,9 +35,9 @@ export default function WebTopMenuTabBar({
   return (
     <View
       style={{
-        backgroundColor: 'rgba(17,19,21,0.82)',
+        backgroundColor: palette.surfaceAlt,
         borderBottomWidth: 1,
-        borderBottomColor: 'rgba(214,235,253,0.18)',
+        borderBottomColor: palette.border,
         paddingTop: 8,
         paddingBottom: 8,
         paddingHorizontal: 12,
@@ -44,7 +46,7 @@ export default function WebTopMenuTabBar({
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <Text
           style={{
-            color: '#f0f0f0',
+            color: palette.textPrimary,
             fontSize: 28,
             letterSpacing: -0.3,
             fontWeight: '500',
@@ -58,14 +60,14 @@ export default function WebTopMenuTabBar({
           onPress={() => setOpen((v) => !v)}
           style={{
             borderWidth: 1,
-            borderColor: 'rgba(214,235,253,0.24)',
+            borderColor: palette.borderStrong,
             borderRadius: 999,
             paddingHorizontal: 12,
             paddingVertical: 6,
-            backgroundColor: 'rgba(78,164,255,0.1)',
+            backgroundColor: palette.primarySoft,
           }}
         >
-          <FontAwesome name={open ? 'close' : 'bars'} size={14} color="#70b1ff" />
+          <FontAwesome name={open ? 'close' : 'bars'} size={14} color={palette.primary} />
         </Pressable>
       </View>
 
@@ -81,7 +83,7 @@ export default function WebTopMenuTabBar({
           {state.routes.map((route, index) => {
             const focused = state.index === index;
             const options = descriptors[route.key]?.options;
-            const color = focused ? '#70b1ff' : '#9aa2a8';
+            const color = focused ? palette.primary : palette.textSecondary;
             const label = getLabel(options?.tabBarLabel, options?.title, route.name);
             return (
               <Pressable
@@ -103,9 +105,9 @@ export default function WebTopMenuTabBar({
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingHorizontal: 12,
-                  backgroundColor: focused ? 'rgba(78,164,255,0.16)' : 'transparent',
+                  backgroundColor: focused ? palette.primarySoft : 'transparent',
                   borderWidth: focused ? 1 : 0,
-                  borderColor: focused ? 'rgba(112,177,255,0.32)' : 'transparent',
+                  borderColor: focused ? palette.borderStrong : 'transparent',
                 }}
               >
                 <View style={{ marginRight: 10 }}>
@@ -130,5 +132,3 @@ export default function WebTopMenuTabBar({
     </View>
   );
 }
-
-
