@@ -1,21 +1,42 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/components/useColorScheme';
+﻿import FontAwesome from "@expo/vector-icons/FontAwesome";
+import {
+  DarkTheme,
+  Theme,
+  ThemeProvider,
+} from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+} from "@expo-google-fonts/inter";
+import {
+  PlayfairDisplay_400Regular,
+  PlayfairDisplay_500Medium,
+} from "@expo-google-fonts/playfair-display";
+import {
+  SpaceGrotesk_400Regular,
+  SpaceGrotesk_500Medium,
+} from "@expo-google-fonts/space-grotesk";
+import {
+  JetBrainsMono_400Regular,
+  JetBrainsMono_500Medium,
+} from "@expo-google-fonts/jetbrains-mono";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import "react-native-reanimated";
+import "../global.css";
+import ToastViewport from "@/components/ui/ToastViewport";
 
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
-} from 'expo-router';
+} from "expo-router";
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  initialRouteName: "auth",
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -23,7 +44,15 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    PlayfairDisplay_400Regular,
+    PlayfairDisplay_500Medium,
+    SpaceGrotesk_400Regular,
+    SpaceGrotesk_500Medium,
+    JetBrainsMono_400Regular,
+    JetBrainsMono_500Medium,
     ...FontAwesome.font,
   });
 
@@ -46,14 +75,32 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const colorScheme = useColorScheme();
-
+  const nocturnalTheme: Theme = {
+    ...DarkTheme,
+    dark: true,
+    colors: {
+      ...DarkTheme.colors,
+      primary: "#70b1ff",
+      background: "#0e0e0e",
+      card: "#131313",
+      text: "#f0f0f0",
+      border: "rgba(214,235,253,0.19)",
+      notification: "#ff716c",
+    },
+  };
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
+    <ThemeProvider value={nocturnalTheme}>
+      <>
+        <Stack>
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="timer" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+        </Stack>
+        <ToastViewport />
+      </>
     </ThemeProvider>
   );
 }
+
+

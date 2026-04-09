@@ -1,35 +1,31 @@
+﻿import React from 'react';
+import { Platform, SafeAreaView, Text, View } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+import AppFooter from '@/components/ui/AppFooter';
 
 export default function ModalScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Modal</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/modal.tsx" />
-
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </View>
+    <SafeAreaView className="flex-1 bg-[#0e0e0e]">
+      <StatusBar style="light" />
+      <View className="flex-1 items-center justify-center px-6">
+        <View
+          className="w-full max-w-[520px] rounded-[20px] bg-[rgba(19,19,19,0.78)] p-6"
+          style={{ borderWidth: 1, borderColor: 'rgba(214,235,253,0.2)' }}
+        >
+          <Text className="font-mono text-[10px] uppercase tracking-[1.2px] text-[#70b1ff]">Produve</Text>
+          <Text className="mt-2 font-display text-[38px] leading-[42px] text-void-text-primary">System Modal</Text>
+          <Text className="mt-3 font-body text-[14px] leading-[22px] text-void-text-secondary">
+            This route is now themed to match your task modal. Keep it as a global utility surface for future settings, shortcuts, or profile actions.
+          </Text>
+        </View>
+      </View>
+      {Platform.OS === 'web' ? (
+        <View className="px-6 pb-4">
+          <AppFooter />
+        </View>
+      ) : null}
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
+

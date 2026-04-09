@@ -1,18 +1,24 @@
-import { Link, Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-
-import { Text, View } from '@/components/Themed';
+﻿import { Link, Stack } from 'expo-router';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import AppFooter from '@/components/ui/AppFooter';
 
 export default function NotFoundScreen() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Oops!' }} />
+      <Stack.Screen options={{ title: 'Not Found' }} />
       <View style={styles.container}>
-        <Text style={styles.title}>This screen doesn't exist.</Text>
+        <View style={styles.content}>
+          <Text style={styles.title}>This screen does not exist.</Text>
 
-        <Link href="/" style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
-        </Link>
+          <Link href="/" style={styles.link}>
+            <Text style={styles.linkText}>Go to Focus</Text>
+          </Link>
+        </View>
+        {Platform.OS === 'web' ? (
+          <View style={styles.footerWrap}>
+            <AppFooter />
+          </View>
+        ) : null}
       </View>
     </>
   );
@@ -21,13 +27,19 @@ export default function NotFoundScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#0e0e0e',
+    justifyContent: 'space-between',
+    padding: 20,
+  },
+  content: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#ffffff',
   },
   link: {
     marginTop: 15,
@@ -35,6 +47,12 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 14,
-    color: '#2e78b7',
+    color: '#70b1ff',
+  },
+  footerWrap: {
+    width: '100%',
+    marginTop: 12,
   },
 });
+
+
