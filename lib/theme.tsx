@@ -2,12 +2,10 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 import { DefaultTheme, DarkTheme, type Theme as NavigationTheme } from '@react-navigation/native';
 import { Platform } from 'react-native';
 
-export type AppThemeId =
-  | 'current'
-  | 'midnight'
-  | 'arctic'
-  | 'emerald'
-  | 'sunset';
+const THEME_STORAGE_KEY = 'produve:theme:v1';
+const VALID_THEME_IDS: AppThemeId[] = ['current', 'midnight', 'arctic', 'emerald', 'sunset', 'custom'];
+
+export type AppThemeId = 'current' | 'midnight' | 'arctic' | 'emerald' | 'sunset' | 'custom';
 
 export type AppPalette = {
   id: AppThemeId;
@@ -29,7 +27,27 @@ export type AppPalette = {
   modalBackground: string;
 };
 
-const THEMES: Record<AppThemeId, AppPalette> = {
+const BASE_CUSTOM_THEME: AppPalette = {
+  id: 'custom',
+  label: 'Custom',
+  dark: true,
+  primary: '#6fb7ff',
+  background: '#101418',
+  surface: 'rgba(22,28,35,0.86)',
+  surfaceAlt: 'rgba(32,40,50,0.9)',
+  textPrimary: '#f0f6ff',
+  textSecondary: '#a9b6c6',
+  textTertiary: '#7f8da0',
+  border: 'rgba(162,186,212,0.2)',
+  borderStrong: 'rgba(162,186,212,0.32)',
+  danger: '#ff7b76',
+  success: '#4de0a9',
+  primarySoft: 'rgba(111,183,255,0.18)',
+  overlay: 'rgba(8,12,18,0.68)',
+  modalBackground: 'rgba(25,33,42,0.92)',
+};
+
+const THEMES: Record<Exclude<AppThemeId, 'custom'>, AppPalette> = {
   current: {
     id: 'current',
     label: 'Current Blue',
@@ -127,25 +145,66 @@ const THEMES: Record<AppThemeId, AppPalette> = {
   },
 };
 
+type ThemeStoragePayload = {
+  themeId: AppThemeId;
+  customPalette: AppPalette;
+};
+
+function readStoredTheme(): ThemeStoragePayload | null {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(THEME_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<ThemeStoragePayload>;
+    if (!parsed || typeof parsed.themeId !== 'string') return null;
+    const themeId = VALID_THEME_IDS.includes(parsed.themeId as AppThemeId) ? (parsed.themeId as AppThemeId) : 'current';
+    const safeCustom = typeof parsed.customPalette === 'object' && parsed.customPalette ? parsed.customPalette : BASE_CUSTOM_THEME;
+    return {
+      themeId,
+      customPalette: { ...BASE_CUSTOM_THEME, ...safeCustom, id: 'custom', label: 'Custom' },
+    };
+  } catch {
+    return null;
+  }
+}
+
+function persistTheme(payload: ThemeStoragePayload) {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // no-op for quota/private mode issues
+  }
+}
+
 type ThemeContextValue = {
   themeId: AppThemeId;
   setThemeId: (value: AppThemeId) => void;
   palette: AppPalette;
   allThemes: AppPalette[];
   navigationTheme: NavigationTheme;
+  customPalette: AppPalette;
+  updateCustomPalette: (patch: Partial<Omit<AppPalette, 'id' | 'label'>>) => void;
+  resetCustomPalette: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function AppThemeProvider({ children }: { children: React.ReactNode }) {
-  const [themeId, setThemeId] = useState<AppThemeId>('current');
-  const palette = THEMES[themeId];
+  const stored = useMemo(() => readStoredTheme(), []);
+  const [themeId, setThemeId] = useState<AppThemeId>(stored?.themeId ?? 'current');
+  const [customPalette, setCustomPalette] = useState<AppPalette>(stored?.customPalette ?? BASE_CUSTOM_THEME);
+
+  const palette = themeId === 'custom' ? customPalette : THEMES[themeId as Exclude<AppThemeId, 'custom'>];
 
   useEffect(() => {
-    if (Platform.OS !== 'web') return;
-    if (typeof document === 'undefined') return;
+    if (Platform.OS !== 'web' || typeof document === 'undefined') return;
     document.documentElement.setAttribute('data-produve-theme', themeId);
   }, [themeId]);
+
+  useEffect(() => {
+    persistTheme({ themeId, customPalette });
+  }, [themeId, customPalette]);
 
   const navigationTheme = useMemo<NavigationTheme>(() => {
     const base = palette.dark ? DarkTheme : DefaultTheme;
@@ -164,15 +223,35 @@ export function AppThemeProvider({ children }: { children: React.ReactNode }) {
     };
   }, [palette]);
 
+  const allThemes = useMemo(() => [...Object.values(THEMES), customPalette], [customPalette]);
+
+  const updateCustomPalette = (patch: Partial<Omit<AppPalette, 'id' | 'label'>>) => {
+    setCustomPalette((prev) => ({
+      ...prev,
+      ...patch,
+      id: 'custom',
+      label: 'Custom',
+    }));
+    setThemeId('custom');
+  };
+
+  const resetCustomPalette = () => {
+    setCustomPalette(BASE_CUSTOM_THEME);
+    setThemeId('custom');
+  };
+
   const value = useMemo<ThemeContextValue>(
     () => ({
       themeId,
       setThemeId,
       palette,
-      allThemes: Object.values(THEMES),
+      allThemes,
       navigationTheme,
+      customPalette,
+      updateCustomPalette,
+      resetCustomPalette,
     }),
-    [themeId, palette, navigationTheme]
+    [themeId, palette, allThemes, navigationTheme, customPalette]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

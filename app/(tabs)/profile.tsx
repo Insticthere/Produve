@@ -4,7 +4,7 @@ import PageScroll from '@/components/ui/PageScroll';
 import { useAppTheme } from '@/lib/theme';
 
 export default function ProfileScreen() {
-  const { palette, themeId, setThemeId, allThemes } = useAppTheme();
+  const { palette, themeId, setThemeId, allThemes, customPalette, updateCustomPalette, resetCustomPalette } = useAppTheme();
   const [focusReminders, setFocusReminders] = useState(true);
   const [autoStartBreaks, setAutoStartBreaks] = useState(false);
   const [groupVisibility, setGroupVisibility] = useState(true);
@@ -69,6 +69,65 @@ export default function ProfileScreen() {
                   </Pressable>
                 );
               })}
+            </View>
+            <View className="mt-4 gap-2">
+              <Text className="font-mono text-[10px] uppercase tracking-[1.2px]" style={{ color: palette.textTertiary }}>Custom Theme Builder</Text>
+              <View className="flex-row gap-2">
+                <TextInput
+                  value={customPalette.primary}
+                  onChangeText={(value) => updateCustomPalette({ primary: value })}
+                  placeholder="#70b1ff"
+                  placeholderTextColor={palette.textTertiary}
+                  className="flex-1 rounded-full border px-4 py-2.5"
+                  style={{ borderColor: palette.border, backgroundColor: palette.surfaceAlt, color: palette.textPrimary }}
+                />
+                <TextInput
+                  value={customPalette.background}
+                  onChangeText={(value) => updateCustomPalette({ background: value })}
+                  placeholder="#101418"
+                  placeholderTextColor={palette.textTertiary}
+                  className="flex-1 rounded-full border px-4 py-2.5"
+                  style={{ borderColor: palette.border, backgroundColor: palette.surfaceAlt, color: palette.textPrimary }}
+                />
+              </View>
+              <View className="flex-row gap-2">
+                <TextInput
+                  value={customPalette.surfaceAlt}
+                  onChangeText={(value) => updateCustomPalette({ surfaceAlt: value })}
+                  placeholder="rgba(...)"
+                  placeholderTextColor={palette.textTertiary}
+                  className="flex-1 rounded-full border px-4 py-2.5"
+                  style={{ borderColor: palette.border, backgroundColor: palette.surfaceAlt, color: palette.textPrimary }}
+                />
+                <TextInput
+                  value={customPalette.textPrimary}
+                  onChangeText={(value) => updateCustomPalette({ textPrimary: value })}
+                  placeholder="#f0f0f0"
+                  placeholderTextColor={palette.textTertiary}
+                  className="flex-1 rounded-full border px-4 py-2.5"
+                  style={{ borderColor: palette.border, backgroundColor: palette.surfaceAlt, color: palette.textPrimary }}
+                />
+              </View>
+              <View className="flex-row gap-2">
+                <Pressable
+                  onPress={() => setThemeId('custom')}
+                  className="rounded-full px-4 py-2"
+                  style={{ backgroundColor: palette.primary }}
+                >
+                  <Text className="font-body text-[12px]" style={{ color: palette.dark ? '#001b32' : '#ffffff' }}>
+                    Apply Custom
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={resetCustomPalette}
+                  className="rounded-full border px-4 py-2"
+                  style={{ borderColor: palette.borderStrong }}
+                >
+                  <Text className="font-body text-[12px]" style={{ color: palette.textPrimary }}>
+                    Reset
+                  </Text>
+                </Pressable>
+              </View>
             </View>
           </View>
 

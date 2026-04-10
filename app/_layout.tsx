@@ -25,6 +25,7 @@ import "react-native-reanimated";
 import "../global.css";
 import ToastViewport from "@/components/ui/ToastViewport";
 import { AppThemeProvider, useAppTheme } from "@/lib/theme";
+import { AppStateProvider } from "@/lib/app-state";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -74,7 +75,9 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <AppThemeProvider>
-      <RootNavigator />
+      <AppStateProvider>
+        <RootNavigator />
+      </AppStateProvider>
     </AppThemeProvider>
   );
 }
